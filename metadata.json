@@ -1,0 +1,6 @@
+{
+  "name": "RentTracker - ระบบบันทึกค่าเช่าและชำระรายเดือน",
+  "description": "แอปพลิเคชันบันทึกการชำระค่าเช่ารายเดือน ติดตามยอดชำระ ประวัติชำระ ยอดคงเหลือ และกำหนดวันที่ชำระครบสำหรับลูกค้า",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
