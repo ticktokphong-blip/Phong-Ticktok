@@ -378,6 +378,8 @@ export default function App() {
           onAddTransaction={handleAddTransaction}
           initialType={quickAddType}
           initialDebtId={quickAddDebtId}
+          onOpenAddDebt={openAddDebtModal}
+          onOpenSyncModal={() => setIsSyncModalOpen(true)}
         />
 
         <DebtModal

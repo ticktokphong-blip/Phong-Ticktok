@@ -13,6 +13,8 @@ interface QuickAddModalProps {
   onAddTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   initialType?: TransactionType;
   initialDebtId?: string;
+  onOpenAddDebt?: () => void;
+  onOpenSyncModal?: () => void;
 }
 
 export const QuickAddModal: React.FC<QuickAddModalProps> = ({
@@ -23,6 +25,8 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
   onAddTransaction,
   initialType = 'debt_payment',
   initialDebtId,
+  onOpenAddDebt,
+  onOpenSyncModal,
 }) => {
   const [txType, setTxType] = useState<TransactionType>(initialType);
   const [selectedDebtId, setSelectedDebtId] = useState<string>(initialDebtId || (debts[0]?.id || ''));
@@ -213,17 +217,75 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
             <>
               {/* 1. Select Tenant Customer */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  ระบุชื่อลูกค้าที่ชำระ <span className="text-rose-500">*</span>
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700">
+                    ระบุชื่อลูกค้าที่ชำระ <span className="text-rose-500">*</span>
+                  </label>
+                  {onOpenAddDebt && debts.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        onOpenAddDebt();
+                      }}
+                      className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 hover:underline"
+                    >
+                      + เพิ่มลูกค้าใหม่
+                    </button>
+                  )}
+                </div>
+
                 {debts.length === 0 ? (
-                  <div className="p-3 bg-amber-50 text-amber-800 text-xs rounded-xl border border-amber-200">
-                    ยังไม่มีข้อมูลลูกค้า กรุณาเพิ่มลูกค้ารายใหม่ก่อนทำรายการรับชำระ
+                  <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl space-y-2.5">
+                    <div className="flex items-start gap-2 text-amber-900 text-xs leading-relaxed">
+                      <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 mt-0.5" />
+                      <div>
+                        <span className="font-bold">ยังไม่มีข้อมูลลูกค้าในระบบบนเครื่องนี้</span>
+                        <p className="text-[11px] text-amber-700 mt-0.5">
+                          (เนื่องจากเป็นเครื่องใหม่หรือพึ่ง Deploy ใหม่ กรุณากดเพิ่มลูกค้าก่อน หรือดึงข้อมูลจาก Google Sheet)
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {onOpenAddDebt && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onClose();
+                            onOpenAddDebt();
+                          }}
+                          className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm transition"
+                        >
+                          <User className="w-3.5 h-3.5" />
+                          + เพิ่มลูกค้าใหม่ทันที
+                        </button>
+                      )}
+                      {onOpenSyncModal && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onClose();
+                            onOpenSyncModal();
+                          }}
+                          className="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm transition"
+                        >
+                          <Building2 className="w-3.5 h-3.5 text-emerald-600" />
+                          ดึงข้อมูลจาก Google Sheets
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <select
                     value={selectedDebtId}
-                    onChange={(e) => setSelectedDebtId(e.target.value)}
+                    onChange={(e) => {
+                      if (e.target.value === '__ADD_NEW__') {
+                        onClose();
+                        onOpenAddDebt?.();
+                      } else {
+                        setSelectedDebtId(e.target.value);
+                      }
+                    }}
                     className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                   >
                     {debts.map((debt) => {
@@ -234,6 +296,9 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                         </option>
                       );
                     })}
+                    {onOpenAddDebt && (
+                      <option value="__ADD_NEW__">➕ เพิ่มลูกค้ารายใหม่...</option>
+                    )}
                   </select>
                 )}
               </div>
